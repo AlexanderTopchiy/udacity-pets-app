@@ -20,6 +20,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.provider.BaseColumns;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -77,9 +78,34 @@ public class CatalogActivity extends AppCompatActivity {
         // Create and/or open a database to read from it
         SQLiteDatabase db = mDbHelper.getReadableDatabase();
 
-        // Perform this raw SQL query "SELECT * FROM pets"
-        // to get a Cursor that contains all rows from the pets table.
-        Cursor cursor = db.rawQuery("SELECT * FROM " + PetEntry.TABLE_NAME, null);
+        // Define a projection that specifies which columns from the database
+        // you will actually use after this query.
+        String[] projection = {
+                BaseColumns._ID,
+                PetEntry.COLUMN_PET_NAME,
+                PetEntry.COLUMN_PET_BREED,
+                PetEntry.COLUMN_PET_GENDER,
+                PetEntry.COLUMN_PET_WEIGHT
+        };
+
+        // Filter results WHERE "title" = 'My Title'
+        String selection = PetEntry.COLUMN_PET_BREED + " = ?";
+        String[] selectionArgs = { "Terrier" };
+
+        // How you want the results sorted in the resulting Cursor
+        String sortOrder = PetEntry.COLUMN_PET_NAME + " DESC";
+
+        // The Cursor object that contains all rows from the pets table.
+        Cursor cursor = db.query(
+                PetEntry.TABLE_NAME,   // The table to query
+                projection,             // The array of columns to return (pass null to get all)
+                selection,              // The columns for the WHERE clause
+                selectionArgs,          // The values for the WHERE clause
+                null,                   // don't group the rows
+                null,                   // don't filter by row groups
+                sortOrder               // The sort order
+        );
+
         try {
             // Display the number of rows in the Cursor (which reflects the number of rows in the
             // pets table in the database).
